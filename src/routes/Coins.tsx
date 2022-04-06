@@ -34,7 +34,7 @@ const Coin = styled.li`
 `;
 
 const Title = styled.h1`
-    color: ${props => props.theme.accentColor}
+    color: ${props => props.theme.accentColor};
 `;
 
 const Loading = styled.div`

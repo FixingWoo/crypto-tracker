@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, Routes, Route } from "react-router-dom";
 import styled from "styled-components";
+import Price from "./Price";
+import Chart from "./Chart";
 
 const Container = styled.div`
     padding: 20px;
     max-width: 480px;
     margin: 0 auto;
+    color: white;
 `;
 
 const Header = styled.header`
@@ -14,10 +17,10 @@ const Header = styled.header`
 `;
 
 const Title = styled.h1`
-    color: ${props => props.theme.accentColor}
+    color: ${(props) => props.theme.accentColor};
 `;
 
-const Loading = styled.div`
+const Loader = styled.div`
     text-align: center;
     color: white;
 `;
@@ -26,6 +29,30 @@ const Img = styled.img`
     width: 35px;
     height: 35px;
     margin-right: 10px;
+`;
+
+const Overview = styled.div`
+    display: flex;
+    justify-content: space-between;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px 20px;
+    border-radius: 10px;
+`;
+
+const OverviewItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  span:first-child {
+    font-size: 10px;
+    font-weight: 400;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+`;
+
+const Description = styled.p`
+  margin: 20px 0px;
 `;
 
 interface RouterState {
@@ -88,9 +115,9 @@ interface PriceData {
 }
 
 function Coin() {
-    const { coins } = useParams();
+    const { coinId } = useParams();
     const location = useLocation();
-    const name = location.state as RouterState;
+    const state = location.state as RouterState;
 
     const [loading, setLoading] = useState(true);
     const [info, setCoin] = useState<InfoData>();
@@ -98,24 +125,60 @@ function Coin() {
 
     useEffect(() => {
         (async () => {
-            const coinInfo = await (await fetch(`https://api.coinpaprika.com/v1/coins/${coins}`)).json();
-            const priceInfo = await (await fetch(`https://api.coinpaprika.com/v1/tickers/${coins}`)).json();
-
-            console.log(coinInfo);
-            console.log(priceInfo);
+            const coinInfo = await (await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)).json();
+            const priceInfo = await (await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)).json();
 
             setCoin(coinInfo);
             setPrice(priceInfo);
+            setLoading(false);
         })();
     }, []);
 
     return (
         <Container>
-            <Header>
-                <Title>{name?.name || "Loading..."}</Title>
-            </Header>
-            {loading ? (<Loading>loading...</Loading>) : null}
-        </Container>        
+            <Title>
+                {state?.name ? state.name : loading ? "Loading..." : info?.name}
+            </Title>
+
+            {loading ? (
+                <Loader>Loading...</Loader>
+            ) : (
+            <>
+                <Overview>
+                    <OverviewItem>
+                        <span>Rank:</span>
+                        <span>{info?.rank}</span>
+                    </OverviewItem>
+                    <OverviewItem>
+                        <span>Symbol:</span>
+                        <span>${info?.symbol}</span>
+                    </OverviewItem>
+                    <OverviewItem>
+                        <span>Open Source:</span>
+                        <span>{info?.open_source ? "Yes" : "No"}</span>
+                    </OverviewItem>
+                </Overview>
+
+                <Description>{info?.description}</Description>
+
+                <Overview>
+                    <OverviewItem>
+                        <span>Total Suply:</span>
+                        <span>{price?.total_supply}</span>
+                    </OverviewItem>
+                    <OverviewItem>
+                        <span>Max Supply:</span>
+                        <span>{price?.max_supply}</span>
+                    </OverviewItem>
+                </Overview>
+
+                <Routes>
+                    <Route path="price" element={<Price />} />
+                    <Route path="chart" element={<Chart />} />
+                </Routes>
+            </>
+            )}        
+      </Container>        
     )
 }
 
