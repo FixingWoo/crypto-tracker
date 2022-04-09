@@ -3,6 +3,8 @@ import { useLocation, useParams, Routes, Route, Link, useMatch } from "react-rou
 import styled from "styled-components";
 import Price from "./Price";
 import Chart from "./Chart";
+import { useQuery } from "react-query";
+import { fetchCoinInfo, fetchTickerInfo } from "../api";
 
 const Container = styled.div`
     padding: 20px;
@@ -142,28 +144,40 @@ function Coin() {
     const location = useLocation();
     const state = location.state as RouterState;
 
-    const [loading, setLoading] = useState(true);
-    const [info, setCoin] = useState<InfoData>();
-    const [price, setPrice] = useState<PriceData>();
+    // const [loading, setLoading] = useState(true);
+    // const [info, setCoin] = useState<InfoData>();
+    // const [price, setPrice] = useState<PriceData>();
 
     const chartMatch = useMatch("/:coinId/chart");
     const priceMatch = useMatch("/:coinId/price");
 
-    useEffect(() => {
-        (async () => {
-            const coinInfo = await (await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)).json();
-            const priceInfo = await (await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)).json();
+    // useEffect(() => {
+    //     (async () => {
+    //         const coinInfo = await (await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)).json();
+    //         const priceInfo = await (await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)).json();
 
-            setCoin(coinInfo);
-            setPrice(priceInfo);
-            setLoading(false);
-        })();
-    }, []);
+    //         setCoin(coinInfo);
+    //         setPrice(priceInfo);
+    //         setLoading(false);
+    //     })();
+    // }, []);
+
+    const { isLoading: infoLoading, data: infoData } = useQuery<InfoData>(
+        ["info", coinId], 
+        () => fetchCoinInfo(coinId)
+    );
+
+    const { isLoading: tickersLoading, data: tickersData } = useQuery<PriceData>(
+        ["tickers", coinId], 
+        () => fetchTickerInfo(coinId)
+    );
+    
+    const loading = infoLoading || tickersLoading;
 
     return (
         <Container>
             <Title>
-                {state?.name ? state.name : loading ? "Loading..." : info?.name}
+                {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
             </Title>
 
             {loading ? (
@@ -173,28 +187,28 @@ function Coin() {
                 <Overview>
                     <OverviewItem>
                         <span>Rank:</span>
-                        <span>{info?.rank}</span>
+                        <span>{infoData?.rank}</span>
                     </OverviewItem>
                     <OverviewItem>
                         <span>Symbol:</span>
-                        <span>${info?.symbol}</span>
+                        <span>${infoData?.symbol}</span>
                     </OverviewItem>
                     <OverviewItem>
                         <span>Open Source:</span>
-                        <span>{info?.open_source ? "Yes" : "No"}</span>
+                        <span>{infoData?.open_source ? "Yes" : "No"}</span>
                     </OverviewItem>
                 </Overview>
 
-                <Description>{info?.description}</Description>
+                <Description>{infoData?.description}</Description>
 
                 <Overview>
                     <OverviewItem>
                         <span>Total Suply:</span>
-                        <span>{price?.total_supply}</span>
+                        <span>{tickersData?.total_supply}</span>
                     </OverviewItem>
                     <OverviewItem>
                         <span>Max Supply:</span>
-                        <span>{price?.max_supply}</span>
+                        <span>{tickersData?.max_supply}</span>
                     </OverviewItem>
                 </Overview>
                 
