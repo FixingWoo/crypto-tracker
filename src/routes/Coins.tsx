@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { useQuery } from "react-query";
 import { fetchCoins } from "../api";
 import { Helmet, HelmetProvider } from "react-helmet-async";
+import { useSetRecoilState } from "recoil";
+import { isDarkAtom } from "../atoms";
 
 const Container = styled.div`
     padding: 20px;
@@ -64,7 +66,13 @@ interface CoinInterface {
     type: string,
 }
 
-function Coins() {
+interface IcoinsProps {
+}
+
+function Coins({} : IcoinsProps) {
+    const setDarkAtom = useSetRecoilState(isDarkAtom);
+    const toggleDarkAtom = () => setDarkAtom(prev => !prev);
+
     const { isLoading, data } = useQuery<CoinInterface[]>("allCoins", fetchCoins);
 
     return (
@@ -76,6 +84,7 @@ function Coins() {
                 
                 <Header>
                     <Title>Crypto Tracker</Title>
+                    <button onClick={toggleDarkAtom}>Toggle Mode</button>
                 </Header>
 
                 {isLoading ? 
