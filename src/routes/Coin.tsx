@@ -144,12 +144,13 @@ function Coin() {
     const location = useLocation();
     const state = location.state as RouterState;
 
+    const chartMatch = useMatch("/:coinId/chart");
+    const priceMatch = useMatch("/:coinId/price");
+
+
     // const [loading, setLoading] = useState(true);
     // const [info, setCoin] = useState<InfoData>();
     // const [price, setPrice] = useState<PriceData>();
-
-    const chartMatch = useMatch("/:coinId/chart");
-    const priceMatch = useMatch("/:coinId/price");
 
     // useEffect(() => {
     //     (async () => {
