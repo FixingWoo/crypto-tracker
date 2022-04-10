@@ -79,7 +79,6 @@ const Tab = styled.span<{ isActive: boolean }>`
   }
 `;
 
-
 interface RouterState {
     name: string
 }
@@ -216,11 +215,11 @@ function Coin() {
                     
                     <Tabs>
                         <Tab isActive={ priceMatch !== null }>
-                            <Link to={`/${coinId}/price`}>Price</Link>
+                            <Link to={`/${coinId}/price`}>Candle</Link>
                         </Tab>
 
                         <Tab isActive= { chartMatch !== null }>
-                            <Link to={`/${coinId}/chart`}>Chart</Link>
+                            <Link to={`/${coinId}/chart`}>Line</Link>
                         </Tab>
                     </Tabs>
 
