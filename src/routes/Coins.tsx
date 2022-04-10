@@ -1,8 +1,8 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { fetchCoins } from "../api";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 
 const Container = styled.div`
     padding: 20px;
@@ -13,6 +13,9 @@ const Container = styled.div`
 const Header = styled.header`
     height: 10vh;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 `;
 
 const CoinsList = styled.ul``;
@@ -36,6 +39,7 @@ const Coin = styled.li`
 `;
 
 const Title = styled.h1`
+    font-size: 35px;
     color: ${props => props.theme.accentColor};
 `;
 
@@ -61,44 +65,38 @@ interface CoinInterface {
 }
 
 function Coins() {
-    // const [coins, setCoins] = useState<CoinInterface[]>([]);
-    // const [loading, setLoading] = useState(true);
-
-    // useEffect(() => {
-    //     (async () => {
-    //         const response = await fetch("https://api.coinpaprika.com/v1/coins");
-    //         const json = await response.json();
-    //         setCoins(json.slice(0, 100));
-    //         setLoading(false);
-    //     })()
-    // }, []);
-
     const { isLoading, data } = useQuery<CoinInterface[]>("allCoins", fetchCoins);
 
     return (
-        <Container>
-            <Header>
-                <Title>코인</Title>
-            </Header>
+        <HelmetProvider>
+            <Container>
+                <Helmet>
+                    <title>Crypto Tracker</title>
+                </Helmet>
+                
+                <Header>
+                    <Title>Crypto Tracker</Title>
+                </Header>
 
-            {isLoading ? 
-                (
-                    <Loading>loading...</Loading>
-                ) :
-                (
-                    <CoinsList>
-                        {data?.slice(0, 100).map((coin) => (
-                            <Coin key={coin.id}>
-                                <Link to={`/${coin.id}`} state={coin}>
-                                    <Img src={`https://cryptocurrencyliveprices.com/img/${coin.id}.png`}/>
-                                    {coin.name} &rarr;
-                                </Link>
-                            </Coin>
-                        ))}
-                    </CoinsList>
-                )
-            }
-        </Container>
+                {isLoading ? 
+                    (
+                        <Loading>loading...</Loading>
+                    ) :
+                    (
+                        <CoinsList>
+                            {data?.slice(0, 100).map((coin) => (
+                                <Coin key={coin.id}>
+                                    <Link to={`/${coin.id}`} state={coin}>
+                                        <Img src={`https://cryptocurrencyliveprices.com/img/${coin.id}.png`}/>
+                                        {coin.name} &rarr;
+                                    </Link>
+                                </Coin>
+                            ))}
+                        </CoinsList>
+                    )
+                }
+            </Container>
+        </HelmetProvider>
     );
 }
 
