@@ -175,7 +175,7 @@ function Coin() {
                 </Helmet>
                 
                 <Header>
-                    <Link to={"/"}>
+                    <Link to={"/"}> 
                         <Title>
                             {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
                         </Title>
